@@ -1,1 +1,72 @@
-*{box-sizing:border-box} :root{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#f6f4ff;background:#111016;color-scheme:dark} body{margin:0;line-height:1.6} main{max-width:780px;margin:auto;padding:60px 24px 40px} nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:56px} .brand{display:flex;align-items:center;gap:12px;font-weight:700;text-decoration:none;font-size:20px;color:inherit}.brand img{width:36px;height:36px;object-fit:contain} a{color:#c4b5fd;text-underline-offset:4px} .eyebrow{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#b9a4fc} h1{font-size:clamp(38px,7vw,58px);letter-spacing:-.045em;line-height:1.08;margin:12px 0 20px} .intro{font-size:18px;max-width:600px;color:#bcb8ca;margin-bottom:32px}.steps{display:grid;gap:16px;list-style:none;padding:0;counter-reset:steps}.steps>li{counter-increment:steps;padding:24px;background:#1c1924;border:1px solid #332c43;border-radius:16px;position:relative;padding-left:76px}.steps>li:before{content:counter(steps);position:absolute;left:24px;top:25px;width:32px;height:32px;background:#34264d;border-radius:50%;display:grid;place-items:center;color:#d6c7ff;font-weight:700}h2{font-size:21px;letter-spacing:-.02em;margin:0 0 8px}p{margin:8px 0 16px}.steps p{color:#c7c1d3}.button{display:inline-flex;align-items:center;justify-content:center;background:#baa1ff;color:#181024;text-decoration:none;padding:12px 20px;border-radius:10px;font-weight:650;min-height:48px}.button:hover{background:#d0bfff}.secondary{background:#30273e;color:#f2eaff}.secondary:hover{background:#433357}.note{padding:20px 24px;border-left:3px solid #9b7ae8;background:#1b1722;border-radius:0 12px 12px 0;margin-top:28px;color:#c7c1d3}.note strong{color:#f6f4ff}.small{font-size:14px;color:#a7a1b4}footer{margin-top:48px;padding-top:20px;border-top:1px solid #332c43;font-size:13px;color:#a7a1b4}footer a{color:inherit}.features{display:flex;gap:10px;flex-wrap:wrap;margin:24px 0}.features span{border:1px solid #3d334e;border-radius:99px;padding:5px 12px;font-size:13px}.actions{display:flex;gap:12px;flex-wrap:wrap;margin:24px 0 36px}a:focus-visible{outline:3px solid #f6f4ff;outline-offset:5px}@media(max-width:480px){main{padding-top:28px}nav{margin-bottom:36px}.steps>li{padding:20px 18px 20px 64px}.steps>li:before{left:18px;top:22px}.button{width:100%}}
+:root {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #f5f3f8;
+  background: #141318;
+  color-scheme: dark;
+  -webkit-font-smoothing: antialiased;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; line-height: 1.5; }
+main { width: min(100% - 48px, 560px); margin: 88px auto 40px; }
+header { margin-bottom: 40px; }
+.icon { display: block; object-fit: contain; margin-bottom: 20px; }
+h1 { margin: 0; font-size: 38px; font-weight: 650; letter-spacing: -.045em; }
+.subtitle { margin: 8px 0 0; color: #aba7b4; font-size: 17px; }
+
+.steps { list-style: none; margin: 0; padding: 0; }
+.steps li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 24px 0;
+  border-top: 1px solid #302d36;
+}
+h2 { margin: 0; font-size: 17px; font-weight: 600; }
+.number { color: #a18abf; margin-right: 8px; font-size: 14px; }
+.step-copy p { margin: 6px 0 0; color: #aba7b4; font-size: 14px; }
+a { color: #c4addf; text-underline-offset: 3px; }
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  min-width: 140px;
+  min-height: 44px;
+  padding: 11px 16px;
+  border-radius: 9px;
+  background: #c4addf;
+  color: #21182c;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+}
+.button:hover { background: #d6c3eb; }
+.secondary { background: #2b2633; color: #e4d9ef; }
+.secondary:hover { background: #393141; }
+.how-to { margin: 14px 0 30px; color: #aba7b4; font-size: 15px; }
+.how-to strong { color: #dfdbe6; font-weight: 500; }
+
+details { color: #aba7b4; font-size: 14px; }
+summary { width: fit-content; cursor: pointer; padding: 10px 0; }
+.help { padding: 0 0 6px; max-width: 500px; }
+.help p { margin: 10px 0; }
+footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 38px;
+  color: #9993a3;
+  font-size: 12px;
+}
+footer a { color: inherit; }
+a:focus-visible, summary:focus-visible { outline: 2px solid #e4d9ef; outline-offset: 5px; }
+
+@media (max-width: 520px) {
+  main { margin-top: 44px; }
+  header { margin-bottom: 30px; }
+  .steps li { display: block; padding: 22px 0; }
+  .button { width: 100%; margin-top: 16px; }
+  .how-to { margin-top: 8px; }
+}
