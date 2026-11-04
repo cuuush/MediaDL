@@ -4,11 +4,39 @@
 import argparse
 from pathlib import Path
 import plistlib
+from uuid import NAMESPACE_URL, uuid5
+
+
+def action_id(name):
+    return str(uuid5(NAMESPACE_URL, f'https://github.com/cuuush/MediaDL/{name}')).upper()
+
+
+def attachment(value):
+    return {'Value': value, 'WFSerializationType': 'WFTextTokenAttachment'}
+
+
+def output(name):
+    return {'Type': 'ActionOutput', 'OutputUUID': action_id(name), 'OutputName': name}
+
+
+def repeat_item(key):
+    return {'Type': 'Variable', 'VariableName': 'Repeat Item', 'Aggrandizements': [
+        {'Type': 'WFCoercionVariableAggrandizement', 'CoercionItemClass': 'WFDictionaryContentItem'},
+        {'Type': 'WFDictionaryValueVariableAggrandizement', 'DictionaryKey': key},
+    ]}
+
+
+def token_text(value):
+    return {'Value': {'string': '\ufffc', 'attachmentsByRange': {'{0, 1}': value}}, 'WFSerializationType': 'WFTextTokenString'}
+
+
+def make_action(identifier, **parameters):
+    return {'WFWorkflowActionIdentifier': 'is.workflow.actions.' + identifier, 'WFWorkflowActionParameters': parameters}
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('input', type=Path, help='Original exported Shortcut plist')
 parser.add_argument('--output', type=Path, required=True, help='Unsigned output .shortcut file')
-parser.add_argument('--version', default='1.4.0', help='Version shown in the introductory comment')
+parser.add_argument('--version', default='1.4.1', help='Version shown in the introductory comment')
 args = parser.parse_args()
 workflow = plistlib.loads(args.input.read_bytes())
 actions = [
@@ -31,6 +59,33 @@ for action in workflow['WFWorkflowActions']:
             'https://github.com/cuuush/MediaDL'
         )
         break
+
+# Offer the available MP4 variants before downloading each video. Photos and
+# single-quality videos keep the existing URL without an extra prompt.
+workflow_actions = workflow['WFWorkflowActions']
+if not any(a.get('WFWorkflowActionParameters', {}).get('CustomOutputName') == 'MediaDL Download URL' for a in workflow_actions):
+    downloads = [(i, a) for i, a in enumerate(workflow_actions)
+                 if a['WFWorkflowActionIdentifier'] == 'is.workflow.actions.downloadurl']
+    if len(downloads) != 1:
+        parser.error(f'Expected exactly one download action; found {len(downloads)}')
+    index, download = downloads[0]
+    group = action_id('Quality Picker')
+    quality = repeat_item('qualityOptions')
+    download['WFWorkflowActionParameters']['WFURL'] = token_text(output('MediaDL Download URL'))
+    workflow_actions[index:index] = [
+        make_action('conditional', WFInput={'Type': 'Variable', 'Variable': attachment(quality)},
+               WFCondition=100, WFControlFlowMode=0, GroupingIdentifier=group),
+        make_action('choosefromlist', WFInput=attachment(quality),
+               WFChooseFromListActionPrompt='Choose video quality',
+               WFChooseFromListActionSelectMultiple=False,
+               UUID=action_id('Video Quality'), CustomOutputName='Video Quality'),
+        make_action('getvalueforkey', WFInput=attachment(repeat_item('qualityUrls')),
+               WFDictionaryKey=token_text(output('Video Quality'))),
+        make_action('conditional', WFControlFlowMode=1, GroupingIdentifier=group),
+        make_action('getvariable', WFVariable=attachment(repeat_item('url'))),
+        make_action('conditional', WFControlFlowMode=2, GroupingIdentifier=group,
+               UUID=action_id('MediaDL Download URL'), CustomOutputName='MediaDL Download URL'),
+    ]
 
 args.output.parent.mkdir(parents=True, exist_ok=True)
 args.output.write_bytes(plistlib.dumps(workflow, fmt=plistlib.FMT_BINARY, sort_keys=False))

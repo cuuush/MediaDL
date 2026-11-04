@@ -49,7 +49,15 @@ test('returns the highest-bitrate MP4 in the Shortcut output format', async () =
   const { output, requests } = await run()
   assert.deepEqual(output, {
     platform: 'X', postId: id, authorUsername: 'example', requiresUserLogin: false,
-    downloadLinks: [{ url: mp4('high', 0).url, timestamp: 1729252800 }]
+    downloadLinks: [{
+      url: mp4('high', 0).url, timestamp: 1729252800,
+      qualityOptions: ['MP4 · 2.18 Mbps', 'MP4 · 0.83 Mbps', 'MP4 · 0.26 Mbps'],
+      qualityUrls: {
+        'MP4 · 2.18 Mbps': mp4('high').url,
+        'MP4 · 0.83 Mbps': mp4('medium').url,
+        'MP4 · 0.26 Mbps': mp4('low').url
+      }
+    }]
   })
   assert.equal(requests.length, 1)
   const request = requests[0]
@@ -170,4 +178,32 @@ test('does not download media from unexpected hosts', async () => {
 test('network failures and malformed JSON return Shortcut errors', async () => {
   assert.match((await run(url, { error: 'Timed out' })).output.errorMessage, /Could not load X media: Timed out/)
   assert.equal((await run(url, { body: 'invalid JSON' })).output.hasError, true)
+})
+
+test('quality labels show resolution and bitrate and map to the correct file', async () => {
+  const post = fixture()
+  post.mediaDetails[0].video_info.variants = [
+    { ...mp4('low', 256000), url: 'https://video.twimg.com/example/vid/avc1/338x270/low.mp4' },
+    { ...mp4('high', 2176000), url: 'https://video.twimg.com/example/vid/avc1/720x574/high.mp4' }
+  ]
+  const { output } = await run(url, { post })
+  const download = output.downloadLinks[0]
+  assert.deepEqual(download.qualityOptions, ['720×574 · 2.18 Mbps', '338×270 · 0.26 Mbps'])
+  assert.equal(download.qualityUrls[download.qualityOptions[1]], post.mediaDetails[0].video_info.variants[0].url)
+})
+
+test('single-quality files need no picker and duplicate URLs are removed', async () => {
+  const post = fixture()
+  post.mediaDetails[0].video_info.variants = [mp4('only', 256000), mp4('only', 256000)]
+  const download = (await run(url, { post })).output.downloadLinks[0]
+  assert.equal(download.url, mp4('only').url)
+  assert.equal(download.qualityOptions, undefined)
+})
+
+test('distinct files with identical bitrate labels remain selectable', async () => {
+  const post = fixture()
+  post.mediaDetails[0].video_info.variants = [mp4('a', 256000), mp4('b', 256000)]
+  const download = (await run(url, { post })).output.downloadLinks[0]
+  assert.deepEqual(download.qualityOptions, ['MP4 · 0.26 Mbps', 'MP4 · 0.26 Mbps (2)'])
+  assert.equal(download.qualityUrls[download.qualityOptions[1]], mp4('b').url)
 })

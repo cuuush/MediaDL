@@ -66,7 +66,29 @@ async function x() {
         if (!variants.length) {
           return scriptError('X did not provide a downloadable MP4 for this attachment')
         }
-        downloadLinks.push({ url: variants[0].url, timestamp })
+        const download = { url: variants[0].url, timestamp }
+        const qualityUrls = {}
+        const seen = new Set()
+        for (const variant of variants) {
+          if (seen.has(variant.url)) continue
+          seen.add(variant.url)
+          const dimensions = /\/(\d+)x(\d+)\//.exec(variant.url)
+          const resolution = dimensions ? `${dimensions[1]}×${dimensions[2]}` : 'MP4'
+          const bitrate = variant.bitrate ? ` · ${(variant.bitrate / 1000000).toFixed(2)} Mbps` : ''
+          const label = `${resolution}${bitrate}`
+          // Distinct files can have the same resolution and bitrate.
+          let uniqueLabel = label
+          let suffix = 2
+          while (Object.prototype.hasOwnProperty.call(qualityUrls, uniqueLabel)) {
+            uniqueLabel = `${label} (${suffix++})`
+          }
+          qualityUrls[uniqueLabel] = variant.url
+        }
+        if (Object.keys(qualityUrls).length > 1) {
+          download.qualityOptions = Object.keys(qualityUrls)
+          download.qualityUrls = qualityUrls
+        }
+        downloadLinks.push(download)
       }
     }
 

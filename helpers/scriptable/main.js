@@ -34,7 +34,7 @@ if (/^https?:\/\/(?:(?:www|mobile|m)\.)?(?:x|twitter)\.com(?:[/?#]|$)/i.test(inp
   return await x()
 }
 
-if (/instagram.com\//.test(inputUrl)) {
+if (/^https?:\/\/(?:(?:www|m)\.)?instagram\.com(?:[/?#]|$)/i.test(inputUrl)) {
   return await instagram()
 }
 

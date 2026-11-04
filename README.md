@@ -4,7 +4,7 @@
 
 # MediaDL — Instagram & X
 
-[![Download Shortcut](https://img.shields.io/badge/download_Shortcut-7c3aed?style=flat-square)](https://github.com/cuuush/MediaDL/releases/latest)
+[![Download Shortcut](https://img.shields.io/badge/download_Shortcut-7c3aed?style=flat-square)](https://cuuush.github.io/MediaDL/install/)
 [![Release](https://img.shields.io/github/v/release/cuuush/MediaDL)](https://github.com/cuuush/MediaDL/releases)
 
 </div>
@@ -25,24 +25,20 @@ version. **Install from this fork's releases to get X support.**
 | Instagram | Post photos, videos, reels, carousels, stories, highlights, profile pictures | Required in Scriptable |
 | X / Twitter | Photos, videos, and animated GIFs in public posts | Not required |
 
-X GIFs are saved as MP4 videos. The highest-bitrate downloadable MP4 is selected;
-photos use the original-size image. Other platforms are not supported.
+X GIFs are saved as MP4 videos. For videos with multiple MP4 variants, choose a
+resolution and bitrate before downloading; photos use the original-size image. Other platforms are not supported.
 
 ## Install
 
-1. Install [Shortcuts](https://apps.apple.com/app/shortcuts/id915249334) and
-   [Scriptable](https://apps.apple.com/app/scriptable/id1405459188) on your iPhone
-   or iPad.
-2. Open the [latest release](https://github.com/cuuush/MediaDL/releases/latest)
-   and download **MediaDL.shortcut** from its assets.
-3. Open the downloaded file and add it to Shortcuts. If you already have MediaDL,
-   replace the old shortcut when prompted. Remove the earlier **MediaDL-X** test
-   copy if it is still installed.
-4. When prompted for network access, choose **Always Allow** for the requests you
-   want MediaDL to make.
+Open the **[MediaDL install page](https://cuuush.github.io/MediaDL/install/)** on your iPhone or iPad:
 
-Scriptable is required for both platforms. The signed Shortcut includes the
-updated script; no code editing is needed to install a release.
+1. **Install [Scriptable](https://apps.apple.com/app/scriptable/id1405459188)** from the App Store. You don't need to open it or create a script.
+2. **Add MediaDL** using the button on the install page. Replace your old MediaDL shortcut if prompted. [Shortcuts](https://apps.apple.com/app/shortcuts/id915249334) is also required.
+3. **Share a post** from Instagram or X and choose **MediaDL**. Allow the requested access.
+
+If you see **“a required app is missing,” install Scriptable and run MediaDL again. You do not need to reinstall the shortcut.** Scriptable is required for both platforms. This shortcut runs on iPhone and iPad.
+
+The signed Shortcut includes the updated script; no code editing is needed. You can also download **MediaDL.shortcut** directly from the [latest release](https://github.com/cuuush/MediaDL/releases/latest), then tap the file in Files to import it.
 
 ## Use
 
@@ -51,7 +47,7 @@ updated script; no code editing is needed to install a release.
    to add it.
 3. For Instagram, sign in through the official Instagram page when Scriptable
    asks, close that page, and share the post again. X does not need a sign-in.
-4. For a post with multiple attachments, choose the files you want to keep.
+4. For X videos, choose a resolution and bitrate when multiple qualities are available. For a post with multiple attachments, choose the files you want to keep.
    MediaDL saves them to an **Instagram** or **X** album in Photos.
 
 For X, use a full `https://x.com/<user>/status/<id>` or

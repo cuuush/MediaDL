@@ -3,6 +3,9 @@ export interface DownloadLink {
   url: string
   /** Creation date of post */
   timestamp: number
+  /** Available MP4 qualities, highest bitrate first; omitted for a single choice. */
+  qualityOptions?: string[]
+  qualityUrls?: Record<string, string>
 }
 
 export interface ScriptableOutput {
