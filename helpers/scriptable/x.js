@@ -73,16 +73,14 @@ async function x() {
           if (seen.has(variant.url)) continue
           seen.add(variant.url)
           const dimensions = /\/(\d+)x(\d+)\//.exec(variant.url)
-          const resolution = dimensions ? `${dimensions[1]}×${dimensions[2]}` : 'MP4'
-          const bitrate = variant.bitrate ? ` · ${(variant.bitrate / 1000000).toFixed(2)} Mbps` : ''
-          const label = `${resolution}${bitrate}`
-          // Distinct files can have the same resolution and bitrate.
-          let uniqueLabel = label
-          let suffix = 2
-          while (Object.prototype.hasOwnProperty.call(qualityUrls, uniqueLabel)) {
-            uniqueLabel = `${label} (${suffix++})`
+          // Use the shorter side for familiar labels in either orientation.
+          const label = dimensions
+            ? `${Math.min(Number(dimensions[1]), Number(dimensions[2]))}p`
+            : 'Best available'
+          // Variants are sorted by bitrate; keep the best file at each resolution.
+          if (!Object.prototype.hasOwnProperty.call(qualityUrls, label)) {
+            qualityUrls[label] = variant.url
           }
-          qualityUrls[uniqueLabel] = variant.url
         }
         if (Object.keys(qualityUrls).length > 1) {
           download.qualityOptions = Object.keys(qualityUrls)

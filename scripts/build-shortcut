@@ -36,7 +36,7 @@ def make_action(identifier, **parameters):
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('input', type=Path, help='Original exported Shortcut plist')
 parser.add_argument('--output', type=Path, required=True, help='Unsigned output .shortcut file')
-parser.add_argument('--version', default='1.4.1', help='Version shown in the introductory comment')
+parser.add_argument('--version', default='1.4.2', help='Version shown in the introductory comment')
 args = parser.parse_args()
 workflow = plistlib.loads(args.input.read_bytes())
 actions = [

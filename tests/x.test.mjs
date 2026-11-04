@@ -11,7 +11,7 @@ const id = '1234567890123456789'
 const url = `https://x.com/example/status/${id}`
 const mp4 = (quality, bitrate) => ({
   content_type: 'video/mp4', bitrate,
-  url: `https://video.twimg.com/example/${quality}.mp4`
+  url: `https://video.twimg.com/example/${({ high: '1280x720', medium: '854x480', low: '640x360' })[quality] || '320x180'}/${quality}.mp4`
 })
 const video = () => ({
   type: 'video',
@@ -51,11 +51,11 @@ test('returns the highest-bitrate MP4 in the Shortcut output format', async () =
     platform: 'X', postId: id, authorUsername: 'example', requiresUserLogin: false,
     downloadLinks: [{
       url: mp4('high', 0).url, timestamp: 1729252800,
-      qualityOptions: ['MP4 · 2.18 Mbps', 'MP4 · 0.83 Mbps', 'MP4 · 0.26 Mbps'],
+      qualityOptions: ['720p', '480p', '360p'],
       qualityUrls: {
-        'MP4 · 2.18 Mbps': mp4('high').url,
-        'MP4 · 0.83 Mbps': mp4('medium').url,
-        'MP4 · 0.26 Mbps': mp4('low').url
+        '720p': mp4('high').url,
+        '480p': mp4('medium').url,
+        '360p': mp4('low').url
       }
     }]
   })
@@ -180,7 +180,7 @@ test('network failures and malformed JSON return Shortcut errors', async () => {
   assert.equal((await run(url, { body: 'invalid JSON' })).output.hasError, true)
 })
 
-test('quality labels show resolution and bitrate and map to the correct file', async () => {
+test('quality labels show only the resolution and map to the correct file', async () => {
   const post = fixture()
   post.mediaDetails[0].video_info.variants = [
     { ...mp4('low', 256000), url: 'https://video.twimg.com/example/vid/avc1/338x270/low.mp4' },
@@ -188,7 +188,7 @@ test('quality labels show resolution and bitrate and map to the correct file', a
   ]
   const { output } = await run(url, { post })
   const download = output.downloadLinks[0]
-  assert.deepEqual(download.qualityOptions, ['720×574 · 2.18 Mbps', '338×270 · 0.26 Mbps'])
+  assert.deepEqual(download.qualityOptions, ['574p', '270p'])
   assert.equal(download.qualityUrls[download.qualityOptions[1]], post.mediaDetails[0].video_info.variants[0].url)
 })
 
@@ -200,10 +200,28 @@ test('single-quality files need no picker and duplicate URLs are removed', async
   assert.equal(download.qualityOptions, undefined)
 })
 
-test('distinct files with identical bitrate labels remain selectable', async () => {
+test('one choice per resolution keeps the highest-bitrate file', async () => {
   const post = fixture()
-  post.mediaDetails[0].video_info.variants = [mp4('a', 256000), mp4('b', 256000)]
+  post.mediaDetails[0].video_info.variants = [mp4('a', 256000), mp4('b', 832000)]
   const download = (await run(url, { post })).output.downloadLinks[0]
-  assert.deepEqual(download.qualityOptions, ['MP4 · 0.26 Mbps', 'MP4 · 0.26 Mbps (2)'])
-  assert.equal(download.qualityUrls[download.qualityOptions[1]], mp4('b').url)
+  assert.equal(download.qualityOptions, undefined)
+  assert.equal(download.url, mp4('b').url)
+})
+
+test('portrait videos use familiar labels rather than their long edge', async () => {
+  const post = fixture()
+  post.mediaDetails[0].video_info.variants = [
+    { ...mp4('high', 2176000), url: 'https://video.twimg.com/example/720x1280/high.mp4' },
+    { ...mp4('low', 256000), url: 'https://video.twimg.com/example/360x640/low.mp4' }
+  ]
+  assert.deepEqual((await run(url, { post })).output.downloadLinks[0].qualityOptions, ['720p', '360p'])
+})
+
+test('unknown dimensions do not expose bitrate or invent a resolution', async () => {
+  const post = fixture()
+  post.mediaDetails[0].video_info.variants = [
+    { ...mp4('high', 2176000), url: 'https://video.twimg.com/example/high.mp4' },
+    mp4('low', 256000)
+  ]
+  assert.deepEqual((await run(url, { post })).output.downloadLinks[0].qualityOptions, ['Best available', '360p'])
 })

@@ -26,7 +26,7 @@ version. **Install from this fork's releases to get X support.**
 | X / Twitter | Photos, videos, and animated GIFs in public posts | Not required |
 
 X GIFs are saved as MP4 videos. For videos with multiple MP4 variants, choose a
-resolution and bitrate before downloading; photos use the original-size image. Other platforms are not supported.
+video quality such as 720p or 480p before downloading; photos use the original-size image. Other platforms are not supported.
 
 ## Install
 
@@ -47,7 +47,7 @@ The signed Shortcut includes the updated script; no code editing is needed. You 
    to add it.
 3. For Instagram, sign in through the official Instagram page when Scriptable
    asks, close that page, and share the post again. X does not need a sign-in.
-4. For X videos, choose a resolution and bitrate when multiple qualities are available. For a post with multiple attachments, choose the files you want to keep.
+4. For X videos, choose a video quality such as 720p or 480p when multiple qualities are available. For a post with multiple attachments, choose the files you want to keep.
    MediaDL saves them to an **Instagram** or **X** album in Photos.
 
 For X, use a full `https://x.com/<user>/status/<id>` or
