@@ -6,7 +6,7 @@ export interface DownloadLink {
 }
 
 export interface ScriptableOutput {
-  platform: 'Instagram'
+  platform: 'Instagram' | 'X'
   postId: string
   authorUsername: string
   downloadLinks: DownloadLink[]
@@ -15,4 +15,9 @@ export interface ScriptableOutput {
 export interface InstagramOutput extends ScriptableOutput {
   requiresUserLogin: boolean
   platform: 'Instagram'
+}
+
+export interface XOutput extends ScriptableOutput {
+  requiresUserLogin: false
+  platform: 'X'
 }

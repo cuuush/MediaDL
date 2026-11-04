@@ -2,80 +2,109 @@
 
 ![MediaDL](square.and.arrow.down.fill.png)
 
-# MediaDL
+# MediaDL — Instagram & X
 
-[![Install MediaDL][install-badge]][install-link]
-[![Release][gh-release-badge]][gh-release-link]
-[![GitHub Issues][gh-issues-badge]][gh-issues-link]
-[![GitHub Pull Requests][gh-pulls-badge]][gh-pulls-link]
+[![Download Shortcut](https://img.shields.io/badge/download_Shortcut-7c3aed?style=flat-square)](https://github.com/cuuush/MediaDL/releases/latest)
+[![Release](https://img.shields.io/github/v/release/cuuush/MediaDL)](https://github.com/cuuush/MediaDL/releases)
 
 </div>
 
-<div align="center">
+Download photos and videos from **Instagram and X (Twitter)** using Apple's
+Shortcuts app and Scriptable. Downloads run on your device and connect directly
+to Instagram or X. No third-party download service, API key, or subscription is
+required.
 
-There are **_no ads, unnecessary prompts, tracking or third-party involved_**; everything is **_executed on-device_** and you never have to leave the currently opened application.
+This fork of [plbstl/MediaDL](https://github.com/plbstl/MediaDL) adds X support.
+The original project's installation link contains the older Instagram-only
+version. **Install from this fork's releases to get X support.**
 
-</div>
+## Supported media
 
-## Supported platforms ✅
+| Platform | What you can save | Sign-in |
+| --- | --- | --- |
+| Instagram | Post photos, videos, reels, carousels, stories, highlights, profile pictures | Required in Scriptable |
+| X / Twitter | Photos, videos, and animated GIFs in public posts | Not required |
 
-- [ ] Facebook
-- [x] Instagram (requires sign-in)
-- [ ] Pinterest
-- [ ] Reddit
-- [ ] Snapchat
-- [ ] Threads
-- [ ] TikTok
-- [ ] Tumblr
-- [ ] Twitch
-- [ ] Vimeo
-- [ ] X (formerly Twitter)
-- [ ] YouTube
+X GIFs are saved as MP4 videos. The highest-bitrate downloadable MP4 is selected;
+photos use the original-size image. Other platforms are not supported.
 
-## How to use 🎛️
+## Install
 
-1. **Share a post:** Click on the relevant Share post icon in the application you're in, to bring up the ShareSheet.
+1. Install [Shortcuts](https://apps.apple.com/app/shortcuts/id915249334) and
+   [Scriptable](https://apps.apple.com/app/scriptable/id1405459188) on your iPhone
+   or iPad.
+2. Open the [latest release](https://github.com/cuuush/MediaDL/releases/latest)
+   and download **MediaDL.shortcut** from its assets.
+3. Open the downloaded file and add it to Shortcuts. If you already have MediaDL,
+   replace the old shortcut when prompted. Remove the earlier **MediaDL-X** test
+   copy if it is still installed.
+4. When prompted for network access, choose **Always Allow** for the requests you
+   want MediaDL to make.
 
-2. **Share to MediaDL:** When the ShareSheet shows, scroll until you find the MediaDL option, then choose it. The first attempt requires you to grant MediaDL permissions to make requests, read through it and click Always Allow.
+Scriptable is required for both platforms. The signed Shortcut includes the
+updated script; no code editing is needed to install a release.
 
-3. **Continue:** Just like that, MediaDL starts working and you can continue using the application. Prompts to select media might popup if you're downloading multiple items at once.
+## Use
 
-4. **Media saved:** A visual loader shows the progress and when its done, the file will have been downloaded and placed in the relevant location in your device.
+1. Share a post from Instagram, X, or your browser.
+2. Choose **MediaDL** in the share sheet. If it is missing, use **Edit Actions**
+   to add it.
+3. For Instagram, sign in through the official Instagram page when Scriptable
+   asks, close that page, and share the post again. X does not need a sign-in.
+4. For a post with multiple attachments, choose the files you want to keep.
+   MediaDL saves them to an **Instagram** or **X** album in Photos.
 
-MediaDL works in browsers too.
+For X, use a full `https://x.com/<user>/status/<id>` or
+`https://twitter.com/<user>/status/<id>` link. Query strings such as `?s=42` are
+accepted. A link ending in `/video/2` or `/photo/2` selects the second attachment;
+share the plain post URL to download all supported attachments.
 
-## Installation 📲
+## Limits and troubleshooting
 
-1. The Shortcuts app comes preinstalled on Apple devices. In the case that yours is deleted, install [Shortcuts][shortcuts-app-link] from the App Store.
-2. Scriptable is used for functionality not yet available in the Shortcuts app. Just like Shortcuts app, you can use it for a lot of other things. Install [Scriptable][scriptable-app-link] from the App Store.
-3. Add the [MediaDL][mediadl-shortcut-link] shortcut to your Shortcuts library.
-4. Attempt to download media from a supported platform of your choice.
+- **Unsupported platform:** Make sure you installed this fork's release and
+  selected **MediaDL**. The upstream shortcut only supports Instagram.
+- **X post unavailable:** X's public embed endpoint may omit private, deleted,
+  sensitive, or otherwise restricted posts. Signing in will not unlock those
+  posts in this downloader.
+- **X has no downloadable MP4:** Some videos are only exposed as streaming
+  playlists. This version cannot convert those streams into a video file.
+- Shortened `t.co` links, quoted-post attachments, external video cards, and live
+  broadcasts are not supported.
+- For Instagram, the signed-in account must have access to the media. On mobile
+  data, allow network access for both Shortcuts and Scriptable.
 
-   > If the platform requires you to sign in, **Scriptable** will open a WebView for you to sign in. Sign in and close Scriptable. Future downloads from the selected platform should complete from now on.
+MediaDL never asks you to provide a password to this project. Instagram sign-in
+happens on Instagram's own page inside Scriptable. Only download and share media
+you have permission to use, and credit its creators.
 
-5. Select `Always Allow` when prompted for network access to avoid prompts every time you use MediaDL.
+## Development
 
-## Important Notes 🗒️
+The platform handlers are in `helpers/scriptable/`. They return media URLs and
+metadata to the Shortcut, which downloads the files and saves them to Photos.
 
-- MediaDL will **_never ask_** for your username/email or password. You will be presented with a WebView to login into the relevant official platform using their official methods.
+Run the tests and generate the combined Scriptable source:
 
-- When using mobile data to access the internet, mobile data has to be turned on for both **Shortcuts** & **Scriptable** in your device settings for downloads to work.
+```sh
+node --test tests/*.test.mjs
+bash scripts/merge-scriptable
+```
 
-- You have to be signed in to the specific platform to access media private to you.
+To update an existing installation manually, replace the JavaScript in its
+**first Scriptable action** with `scriptable.js`. Keep the existing input
+parameter and the separate Instagram login action.
 
-- You may not have access to sensitive/NSFW content without being signed in to the specific platform.
+To build an importable Shortcut, export the original MediaDL shortcut as a file,
+then run these commands on a Mac:
 
-## Ethics and Disclaimer ⚠️
+```sh
+python3 scripts/build-shortcut Original.shortcut --output build/MediaDL.unsigned.shortcut
+shortcuts sign --mode anyone --input build/MediaDL.unsigned.shortcut --output build/MediaDL.shortcut
+```
 
-MediaDL is a tool designed to simplify content downloads from the internet, with **_zero liability_**. You are responsible for what you download, how you use, and distribute that content. Please be mindful of using others’ content and always credit the original creators. Fair use and proper credits benefit everyone.
-
-**MediaDL is NOT a piracy tool** and cannot be used as such. It only downloads free, publicly accessible content, which can also be downloaded through any browser’s developer tools. This tool offers a **convenient**, **clutter-free**, **one-click solution** for repetitive actions.
-
-> This section is gotten from <https://github.com/imputnet/cobalt#ethics-and-disclaimer> and refined a bit.
-
-## Contribute 💡
-
-Check the [Contribution Guide](./CONTRIBUTING.md) for how to contribute to this project.
+The builder replaces the embedded downloader and updates the introduction while
+preserving the existing input bindings and download/save actions. Signing
+requires Apple's service. See [CONTRIBUTING.md](CONTRIBUTING.md) for the original
+project's contribution guide.
 
 ## License 🤝
 
@@ -96,20 +125,3 @@ Check the [Contribution Guide](./CONTRIBUTING.md) for how to contribute to this 
 - **ShareAlike** — If you remix, transform, or build upon the material, you must distribute your contributions under the same license as the original.
 
 - **No additional restrictions** — You may not apply legal terms or technological measures that legally restrict others from doing anything the license permits.
-
-<!-- Badges -->
-
-[gh-issues-badge]: https://img.shields.io/github/issues/plbstl/MediaDL
-[gh-issues-link]: https://github.com/plbstl/MediaDL/issues
-[gh-pulls-badge]: https://img.shields.io/github/issues-pr/plbstl/MediaDL
-[gh-pulls-link]: https://github.com/plbstl/MediaDL/pulls
-[gh-release-badge]: https://img.shields.io/github/v/release/plbstl/MediaDL?sort=semver
-[gh-release-link]: https://github.com/plbstl/MediaDL/releases
-[install-badge]: https://img.shields.io/badge/install_MediaDL-7c3aed?style=flat-square
-[install-link]: https://plbstl.github.io/MediaDL/install
-
-<!-- App links -->
-
-[mediadl-shortcut-link]: https://www.icloud.com/shortcuts/b0792743b4694f28a246f8a31336c960
-[scriptable-app-link]: https://apps.apple.com/app/scriptable/id1405459188
-[shortcuts-app-link]: https://apps.apple.com/app/shortcuts/id915249334

@@ -1,0 +1,37 @@
+#!/usr/bin/env python3
+"""Replace the embedded MediaDL script in an exported, unsigned Shortcut plist."""
+
+import argparse
+from pathlib import Path
+import plistlib
+
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('input', type=Path, help='Original exported Shortcut plist')
+parser.add_argument('--output', type=Path, required=True, help='Unsigned output .shortcut file')
+parser.add_argument('--version', default='1.4.0', help='Version shown in the introductory comment')
+args = parser.parse_args()
+workflow = plistlib.loads(args.input.read_bytes())
+actions = [
+    action['WFWorkflowActionParameters']
+    for action in workflow['WFWorkflowActions']
+    if action['WFWorkflowActionIdentifier'] == 'dk.simonbs.Scriptable.RunScriptInlineIntent'
+    and 'args.shortcutParameter' in action.get('WFWorkflowActionParameters', {}).get('script', '')
+]
+if len(actions) != 1:
+    parser.error(f'Expected exactly one MediaDL Scriptable action; found {len(actions)}')
+
+root = Path(__file__).resolve().parent.parent
+actions[0]['script'] = ''.join(path.read_text() for path in sorted((root / 'helpers/scriptable').glob('*.js')))
+for action in workflow['WFWorkflowActions']:
+    parameters = action.get('WFWorkflowActionParameters', {})
+    if action['WFWorkflowActionIdentifier'] == 'is.workflow.actions.comment' and parameters.get('WFCommentActionText', '').startswith('MediaDL v'):
+        parameters['WFCommentActionText'] = (
+            f'MediaDL v{args.version} — Instagram + X\n\n'
+            'Download photos and videos from Instagram and X.\n\n'
+            'https://github.com/cuuush/MediaDL'
+        )
+        break
+
+args.output.parent.mkdir(parents=True, exist_ok=True)
+args.output.write_bytes(plistlib.dumps(workflow, fmt=plistlib.FMT_BINARY, sort_keys=False))
+print(f'Built {args.output}; sign it with shortcuts sign before importing')

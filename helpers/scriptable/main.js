@@ -14,7 +14,9 @@
  *
  * A `var` is used so that it is hoisted to the top of the generated `scriptable.js` module.
  */
-var inputUrl = args.shortcutParameter
+var inputUrl = typeof args.shortcutParameter === 'string'
+  ? args.shortcutParameter.trim()
+  : args.shortcutParameter
 
 if (!inputUrl) {
   return scriptError('An empty URL was passed in')
@@ -23,6 +25,14 @@ if (!inputUrl) {
 /******************************************************************************
  * Main
  *****************************************************************************/
+
+if (typeof inputUrl !== 'string') {
+  return scriptError('Share a post URL as text')
+}
+
+if (/^https?:\/\/(?:(?:www|mobile|m)\.)?(?:x|twitter)\.com(?:[/?#]|$)/i.test(inputUrl)) {
+  return await x()
+}
 
 if (/instagram.com\//.test(inputUrl)) {
   return await instagram()
